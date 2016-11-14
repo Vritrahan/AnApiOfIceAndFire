@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using AnApiOfIceAndFire.Domain.Services;
+using AnApiOfIceAndFire.Domain;
 using AnApiOfIceAndFire.Infrastructure.Links;
 using AnApiOfIceAndFire.Models.v1.Mappers;
 
@@ -31,8 +31,7 @@ namespace AnApiOfIceAndFire.Controllers.v1
             _pagingLinksFactory = pagingLinksFactory;
         }
 
-        [HttpGet]
-        public virtual async Task<IHttpActionResult> Get(int id)
+        protected virtual async Task<IHttpActionResult> GetSingle(int id)
         {
             var model = await _modelService.GetAsync(id);
             if (model == null)

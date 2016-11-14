@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Http.Routing;
-using AnApiOfIceAndFire.Domain.Models;
-using AnApiOfIceAndFire.Domain.Models.Filters;
+using AnApiOfIceAndFire.Domain.Books;
 using AnApiOfIceAndFire.Infrastructure.Links;
 using Geymsla.Collections;
 
@@ -13,8 +12,8 @@ namespace AnApiOfIceAndFire.Models.v1
         public IEnumerable<Link> Create<T>(IPagedList<T> pagedList, UrlHelper urlHelper, BookFilter filter)
         {
             if (pagedList == null) throw new ArgumentNullException(nameof(pagedList));
+            if (urlHelper == null) throw new ArgumentNullException(nameof(urlHelper));
             if (filter == null) throw new ArgumentNullException(nameof(filter));
-            if (pagedList == null) throw new ArgumentNullException(nameof(pagedList));
 
             var routeValues = new Dictionary<string,object>();
             if (!string.IsNullOrEmpty(filter.Name))
@@ -30,7 +29,7 @@ namespace AnApiOfIceAndFire.Models.v1
                 routeValues.Add("toReleaseDate", filter.ToReleaseDate.Value);
             }
 
-            return pagedList.ToPagingLinks(urlHelper, BookLinkCreator.BookRouteName, routeValues);
+            return pagedList.ToPagingLinks(urlHelper, BookLinkCreator.MultipleBooksRouteName, routeValues);
         }
     }
 }

@@ -4,17 +4,16 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Hosting;
 using System.Web.Http.Results;
-using System.Web.Http.Routing;
 using AnApiOfIceAndFire.Controllers.v1;
 using AnApiOfIceAndFire.Data.Entities;
-using AnApiOfIceAndFire.Domain.Services;
 using AnApiOfIceAndFire.Models.v1;
 using AnApiOfIceAndFire.Models.v1.Mappers;
 using Geymsla.EntityFramework;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
+using AnApiOfIceAndFire.Domain.Characters;
+using Gender = AnApiOfIceAndFire.Models.v1.Gender;
 // ReSharper disable PossibleMultipleEnumeration
 
 namespace AnApiOfIceAndFire.Tests.IntegrationTests
@@ -26,7 +25,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
         public async Task GivenThatNoCharacterExists_WhenTryingToGetCharacterWithIdOne_ThenNoCharacterIsReturnedAndResponseIsNotFound()
         {
             var controller = CreateCharactersController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/characters/1");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/characters/1");
             controller.Configuration = new HttpConfiguration();
 
             var response = await controller.Get(id: 1);
@@ -48,7 +47,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
                 TvSeries = new[] { "seriesOne" }
             });
             var controller = CreateCharactersController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/characters/1");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/characters/1");
             controller.Configuration = new HttpConfiguration();
 
             var response = await controller.Get(id: 1);
@@ -91,7 +90,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
             });
 
             var controller = CreateCharactersController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/characters");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/characters");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/characters"));
 
@@ -127,7 +126,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
                 });
 
             var controller = CreateCharactersController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/characters");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/characters");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/characters"));
 
@@ -167,7 +166,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
                 });
 
             var controller = CreateCharactersController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/characters");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/characters");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/characters"));
 
@@ -209,7 +208,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
                 });
 
             var controller = CreateCharactersController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/characters");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/characters");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/characters"));
 
@@ -253,7 +252,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
                 });
 
             var controller = CreateCharactersController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/characters");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/characters");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/characters"));
 
@@ -296,7 +295,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
                });
 
             var controller = CreateCharactersController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/characters");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/characters");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/characters"));
 
@@ -327,7 +326,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
                 IsFemale = true
             });
             var controller = CreateCharactersController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/characters");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/characters");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/characters"));
 
@@ -367,12 +366,12 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
                 IsFemale = false
             });
             var controller = CreateCharactersController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/characters");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/characters");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/characters"));
 
             IEnumerable<Character> characters;
-            var result = await controller.Get(gender: Gender.Female);
+            var result = await controller.Get(gender: AnApiOfIceAndFire.Models.v1.Gender.Female);
             result.TryGetContentValue(out characters);
 
             foreach (var character in characters)
@@ -398,7 +397,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
                 IsFemale = false
             });
             var controller = CreateCharactersController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/characters");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/characters");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/characters"));
 
@@ -450,7 +449,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
                 IsFemale = null
             });
             var controller = CreateCharactersController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/characters");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/characters");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/characters"));
 
@@ -505,7 +504,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
                 IsFemale = false
             });
             var controller = CreateCharactersController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/characters");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/characters");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/characters"));
 
@@ -517,33 +516,6 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
             {
                 Assert.AreEqual(Gender.Unknown, character.Gender);
             }
-        }
-
-        private static UrlHelper CreateUrlHelper(string requestUri)
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, new Uri(requestUri));
-
-            var configuration = new HttpConfiguration();
-            configuration.Routes.MapHttpRoute(
-                name: "BooksApi",
-                routeTemplate: "api/books/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
-            configuration.Routes.MapHttpRoute(
-               name: "CharactersApi",
-               routeTemplate: "api/characters/{id}",
-               defaults: new { id = RouteParameter.Optional }
-           );
-            configuration.Routes.MapHttpRoute(
-               name: "HousesApi",
-               routeTemplate: "api/houses/{id}",
-               defaults: new { id = RouteParameter.Optional }
-           );
-            requestMessage.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, configuration);
-
-            var urlHelper = new UrlHelper(requestMessage);
-
-            return urlHelper;
         }
 
         private void SeedDatabase(params CharacterEntity[] characters)

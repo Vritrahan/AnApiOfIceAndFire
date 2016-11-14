@@ -4,12 +4,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Hosting;
 using System.Web.Http.Results;
-using System.Web.Http.Routing;
 using AnApiOfIceAndFire.Controllers.v1;
 using AnApiOfIceAndFire.Data.Entities;
-using AnApiOfIceAndFire.Domain.Services;
+using AnApiOfIceAndFire.Domain.Books;
 using AnApiOfIceAndFire.Models.v1;
 using AnApiOfIceAndFire.Models.v1.Mappers;
 using Geymsla.EntityFramework;
@@ -26,7 +24,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
         public async Task GivenThatNoBookExists_WhenTryingToGetBookWithidOne_ThenNoBookIsReturnedAndResponseIsNotFound()
         {
             var controller = CreateBooksController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/books/1");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/books/1");
             controller.Configuration = new HttpConfiguration();
 
             var response = await controller.Get(id: 1);
@@ -49,7 +47,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
                 Country = "USA"
             });
             var controller = CreateBooksController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/books/1");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/books/1");
             controller.Configuration = new HttpConfiguration();
 
             var response = await controller.Get(id: 1);
@@ -92,7 +90,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
                 Country = "USA"
             });
             var controller = CreateBooksController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/books");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/books");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/books"));
 
@@ -128,7 +126,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
             });
 
             var controller = CreateBooksController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/books");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/books");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/books"));
 
@@ -166,7 +164,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
             });
 
             var controller = CreateBooksController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/books");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/books");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/books"));
 
@@ -204,7 +202,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
             });
 
             var controller = CreateBooksController();
-            controller.Url = CreateUrlHelper("http://localhost.com/api/books");
+            controller.Url = Helper.CreateUrlHelper("http://localhost.com/api/books");
             controller.Configuration = new HttpConfiguration();
             controller.Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com/api/books"));
 
@@ -217,34 +215,7 @@ namespace AnApiOfIceAndFire.Tests.IntegrationTests
             Assert.AreEqual(1, books.Count());
             Assert.AreEqual("bookTwo", book.Name);
         }
-
-        private static UrlHelper CreateUrlHelper(string requestUri)
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, new Uri(requestUri));
-
-            var configuration = new HttpConfiguration();
-            configuration.Routes.MapHttpRoute(
-                name: "BooksApi",
-                routeTemplate: "api/books/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
-            configuration.Routes.MapHttpRoute(
-               name: "CharactersApi",
-               routeTemplate: "api/characters/{id}",
-               defaults: new { id = RouteParameter.Optional }
-           );
-            configuration.Routes.MapHttpRoute(
-               name: "HousesApi",
-               routeTemplate: "api/houses/{id}",
-               defaults: new { id = RouteParameter.Optional }
-           );
-            requestMessage.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, configuration);
-
-            var urlHelper = new UrlHelper(requestMessage);
-
-            return urlHelper;
-        }
-
+        
         private void SeedDatabase(params BookEntity[] books)
         {
             DbContext.Books.AddRange(books);

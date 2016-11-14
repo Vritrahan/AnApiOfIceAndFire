@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Web.Configuration;
 using System.Web.Http;
-using System.Web.Http.Dispatcher;
+using System.Web.Http.Cors;
 using System.Web.Http.ExceptionHandling;
 using AnApiOfIceAndFire.Infrastructure;
 using CacheCow.Server;
@@ -10,9 +10,6 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
-using static AnApiOfIceAndFire.Models.v1.BookLinkCreator;
-using static AnApiOfIceAndFire.Models.v1.CharacterLinkCreator;
-using static AnApiOfIceAndFire.Models.v1.HouseLinkCreator;
 
 namespace AnApiOfIceAndFire
 {
@@ -50,48 +47,27 @@ namespace AnApiOfIceAndFire
             config.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new StringEnumConverter());
 
             //Add our own media type to enable versioning via the accept header. Make this sexier, maybe use reflection to reflect all current namespaces?
-            config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue(AcceptHeaderControllerSelector.AllowedAcceptHeaderMediaType)
+            config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue(HeaderVersioningConfig.AllowedAcceptHeaderMediaType)
             {
-                Parameters = { new NameValueHeaderValue(AcceptHeaderControllerSelector.AllowedAcceptHeaderMediaTypeParamter, "1") }
+                Parameters = { new NameValueHeaderValue(HeaderVersioningConfig.AllowedAcceptHeaderMediaTypeParameter, "1") }
             });
 
             //Remove the possibility to serialize models to XML since we don't want to support that at the moment.
             config.Formatters.Remove(config.Formatters.XmlFormatter);
 
-            //Replace the default IHttpControllerSelector with our own that selects controllers based on Accept header and namespaces.
-            config.Services.Replace(typeof(IHttpControllerSelector), new AcceptHeaderControllerSelector(config));
+            EnableCrossSiteRequests(config);
 
-            //This is not super sexy but it's needed to be able to create URLs to other resources.
-            //We can't use RouteAttributes since that messes with our controller selector, thus this is the "best" solution we can use.
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+        }
 
-            config.Routes.MapHttpRoute(
-                name: "EndpointsApi",
-                routeTemplate: "api",
-                defaults: new { controller = "Endpoints", action = "Get" }
-            );
-
-            config.Routes.MapHttpRoute(
-                name: BookRouteName,
-                routeTemplate: "api/books/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
-
-            config.Routes.MapHttpRoute(
-                name: CharacterRouteName,
-                routeTemplate: "api/characters/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
-
-            config.Routes.MapHttpRoute(
-                name: HouseRouteName,
-                routeTemplate: "api/houses/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
+        private static void EnableCrossSiteRequests(HttpConfiguration config)
+        {
+            var cors = new EnableCorsAttribute(origins: "*", headers: "*", methods: "GET,HEAD");
+            config.EnableCors(cors);
         }
     }
 }

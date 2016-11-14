@@ -6,20 +6,18 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Hosting;
 using System.Web.Http.Results;
 using System.Web.Http.Routing;
 using AnApiOfIceAndFire.Controllers.v1;
-using AnApiOfIceAndFire.Domain.Models;
-using AnApiOfIceAndFire.Domain.Models.Filters;
-using AnApiOfIceAndFire.Domain.Services;
+using AnApiOfIceAndFire.Domain;
+using AnApiOfIceAndFire.Domain.Books;
 using AnApiOfIceAndFire.Infrastructure.Links;
 using AnApiOfIceAndFire.Models.v1;
 using AnApiOfIceAndFire.Models.v1.Mappers;
 using Geymsla.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
-using MediaType = AnApiOfIceAndFire.Domain.Models.MediaType;
+using MediaType = AnApiOfIceAndFire.Domain.Books.MediaType;
 
 namespace AnApiOfIceAndFire.Tests.Controllers
 {
@@ -32,7 +30,7 @@ namespace AnApiOfIceAndFire.Tests.Controllers
         {
             var service = MockRepository.GenerateMock<IModelService<IBook, BookFilter>>();
             service.Stub(x => x.GetAsync(Arg<int>.Is.Anything)).Return(Task.FromResult((IBook)null));
-            BaseController<IBook, Book, BookFilter> controller = new BooksController(service, MockRepository.GenerateMock<IModelMapper<IBook, Book>>(), MockRepository.GenerateMock<IPagingLinksFactory<BookFilter>>());
+            BooksController controller = new BooksController(service, MockRepository.GenerateMock<IModelMapper<IBook, Book>>(), MockRepository.GenerateMock<IPagingLinksFactory<BookFilter>>());
 
             var result = await controller.Get(1);
 
@@ -60,7 +58,7 @@ namespace AnApiOfIceAndFire.Tests.Controllers
                 .Return(new Book("someKindOfUrl/1", book.Name, book.ISBN, book.Authors, book.NumberOfPages,
                     book.Publisher, book.Country,
                     AnApiOfIceAndFire.Models.v1.MediaType.Hardcover, book.Released, new List<string>(), new List<string>()));
-            BaseController<IBook, Book, BookFilter> controller = new BooksController(service, mapper, MockRepository.GenerateMock<IPagingLinksFactory<BookFilter>>());
+            BooksController controller = new BooksController(service, mapper, MockRepository.GenerateMock<IPagingLinksFactory<BookFilter>>());
 
 
             var result = await controller.Get(1);
@@ -114,7 +112,7 @@ namespace AnApiOfIceAndFire.Tests.Controllers
             {
                 Configuration = new HttpConfiguration(),
                 Request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost.com")),
-                Url = CreateUrlHelper("http://localhost.com")
+                Url = Helper.CreateUrlHelper("http://localhost.com")
             };
 
 
@@ -126,7 +124,7 @@ namespace AnApiOfIceAndFire.Tests.Controllers
         }
 
         private static IBook CreateMockedBook(int id, string name = "bookName", string isbn = "isbn", int numberOfPages = 100, string publisher = "publisher",
-            string country = "country", MediaType mediaType = MediaType.Hardcover)
+            string country = "country", MediaType mediaType = Domain.Books.MediaType.Hardcover)
         {
             var book = MockRepository.GenerateMock<IBook>();
             book.Stub(x => x.Identifier).Return(id);
@@ -140,33 +138,6 @@ namespace AnApiOfIceAndFire.Tests.Controllers
             book.Stub(x => x.Authors).Return(new List<string> { "authorOne" });
 
             return book;
-        }
-
-        private static UrlHelper CreateUrlHelper(string requestUri)
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, new Uri(requestUri));
-
-            var configuration = new HttpConfiguration();
-            configuration.Routes.MapHttpRoute(
-                name: "BooksApi",
-                routeTemplate: "api/books/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
-            configuration.Routes.MapHttpRoute(
-               name: "CharactersApi",
-               routeTemplate: "api/characters/{id}",
-               defaults: new { id = RouteParameter.Optional }
-           );
-            configuration.Routes.MapHttpRoute(
-               name: "HousesApi",
-               routeTemplate: "api/houses/{id}",
-               defaults: new { id = RouteParameter.Optional }
-           );
-            requestMessage.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, configuration);
-
-            var urlHelper = new UrlHelper(requestMessage);
-
-            return urlHelper;
         }
     }
 }
